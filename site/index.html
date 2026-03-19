@@ -1,37 +1,1782 @@
 <!DOCTYPE html>
-
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>NGINX on Railway</title>
-    <meta name="description" content="Choo Choo!" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BillsClerk — AI Invoice Data Entry, Done For You</title>
+  <meta name="description" content="Forward your invoices. Get bookkeeping-ready data. BillsClerk extracts, categorizes, and reconciles your invoices into spreadsheet-ready entries — automatically." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Tokens ──────────────────────────────────────────────────── */
+    :root {
+      --white:          #FFFFFF;
+      --page-bg:        #FFFFFF;
 
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+      /* Dark surfaces */
+      --dark:           #0B0D18;
+      --dark-2:         #10121F;
+      --dark-card:      #161929;
+      --dark-border:    rgba(255,255,255,0.08);
+      --dark-border-2:  rgba(255,255,255,0.12);
 
-    <link rel="stylesheet" href="/styles.css?v=1.0" />
-  </head>
+      /* Light surfaces */
+      --surface:        #FFFFFF;
+      --surface-tint:   #F3F2FF;
+      --surface-muted:  #F7F8FA;
+      --border-soft:    #E4E2FF;
+      --border-gray:    #E8EAF0;
 
-  <body>
-    <main>
-      <img
-        src="https://railway.app/brand/logo-light.svg"
-        alt="Railway logo"
-        class="logo"
-      />
+      /* Text */
+      --text-primary:   #0D0F1C;
+      --text-secondary: #4B5063;
+      --text-tertiary:  #8C93A0;
+      --text-inverse:   #FFFFFF;
 
-      <h1>NGINX on Railway</h1>
+      /* Accent — vivid violet */
+      --accent:         #5B4FFF;
+      --accent-bright:  #7B6FFF;
+      --accent-deep:    #4438E8;
+      --accent-muted:   #B8B2FF;
+      --accent-surface: #EEECFF;
+      --accent-glow:    rgba(91,79,255,0.35);
 
-      <p>
-        Choo Choo! This is an example of an NGINX static site running on
-        Railway.
-        <a
-          href="https://github.com/railwayapp/starters/tree/master/examples/nginx"
-          >View source</a
-        >.
-      </p>
-    </main>
+      /* Semantic */
+      --success:        #16C26A;
+      --success-bg:     #E6FAF0;
+      --warning:        #F59E0B;
+      --warning-bg:     #FEF3C7;
+      --info:           #3B82F6;
+      --info-bg:        #EFF6FF;
+      --orange:         #F97316;
+      --orange-bg:      #FFF0E6;
 
-    <script src="/script.js"></script>
-  </body>
+      /* Shadows */
+      --shadow-sm:    0 2px 8px rgba(11,13,24,0.06);
+      --shadow-card:  0 8px 28px rgba(11,13,24,0.09);
+      --shadow-float: 0 16px 48px rgba(11,13,24,0.14);
+      --shadow-accent:0 8px 28px rgba(91,79,255,0.40);
+      --shadow-dark:  0 16px 48px rgba(91,79,255,0.20);
+
+      /* Radii */
+      --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+
+      /* Motion */
+      --ease: cubic-bezier(0.2,0.8,0.2,1);
+      --fast: 130ms; --base: 180ms;
+    }
+
+    /* ── Reset ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--page-bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      font-size: 15px; line-height: 24px;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    .section    { padding: 100px 0; }
+
+    /* ── Pill label ─────────────────────────────────────────────── */
+    .pill-label {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 14px; border-radius: var(--r-pill);
+      font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+    }
+    .pill-label--light {
+      background: var(--accent-surface);
+      color: var(--accent);
+      border: 1px solid var(--border-soft);
+    }
+    .pill-label--dark {
+      background: rgba(91,79,255,0.18);
+      color: var(--accent-muted);
+      border: 1px solid rgba(91,79,255,0.25);
+    }
+    .pill-label svg { width: 13px; height: 13px; }
+
+    /* ── Section heading ────────────────────────────────────────── */
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-label--dark { color: var(--accent-muted); }
+    .section-title {
+      font-size: 40px; line-height: 48px;
+      font-weight: 800; letter-spacing: -0.025em;
+      color: var(--text-primary); margin-bottom: 16px;
+    }
+    .section-title--dark { color: var(--white); }
+    .section-title--center { text-align: center; }
+    .section-sub {
+      font-size: 17px; line-height: 28px;
+      color: var(--text-secondary); max-width: 560px;
+    }
+    .section-sub--dark { color: rgba(255,255,255,0.6); }
+    .section-sub--center { margin: 0 auto; text-align: center; }
+    .section-head { margin-bottom: 60px; }
+    .section-head--center { text-align: center; }
+
+    /* ── Buttons ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 48px; padding: 0 24px;
+      border-radius: var(--r-pill);
+      font-size: 15px; font-weight: 600;
+      border: none; cursor: pointer;
+      transition: all var(--base) var(--ease);
+      white-space: nowrap;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn svg { width: 17px; height: 17px; }
+
+    .btn--accent {
+      background: var(--accent);
+      color: var(--white);
+      box-shadow: var(--shadow-accent);
+    }
+    .btn--accent:hover { background: var(--accent-deep); box-shadow: 0 12px 36px rgba(91,79,255,0.50); }
+
+    .btn--dark {
+      background: var(--dark);
+      color: var(--white);
+      box-shadow: var(--shadow-float);
+    }
+    .btn--dark:hover { background: #070910; }
+
+    .btn--ghost-light {
+      background: rgba(255,255,255,0.12);
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .btn--ghost-light:hover { background: rgba(255,255,255,0.20); }
+
+    .btn--outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-gray);
+    }
+    .btn--outline:hover { background: var(--surface-muted); }
+
+    .btn--white {
+      background: var(--white);
+      color: var(--accent);
+      box-shadow: var(--shadow-float);
+      font-weight: 700;
+    }
+    .btn--white:hover { background: #f5f4ff; }
+
+    .btn--sm { height: 38px; padding: 0 18px; font-size: 13px; }
+
+    /* ── Card base ──────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border-gray);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-card);
+      padding: 28px;
+    }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* NAV                                                          */
+    /* ════════════════════════════════════════════════════════════ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,13,24,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--dark-border);
+    }
+    .nav__inner {
+      display: flex; align-items: center;
+      height: 66px; gap: 8px;
+    }
+    .nav__logo {
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0; text-decoration: none;
+    }
+    .nav__logo-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+    }
+    .nav__wordmark {
+      display: flex; align-items: baseline; gap: 0;
+      line-height: 1; font-size: 17px; letter-spacing: -0.02em;
+    }
+    .nav__wordmark-bills  { font-weight: 800; color: var(--white); }
+    .nav__wordmark-clerk  { font-weight: 500; color: rgba(255,255,255,0.5); }
+    .nav__links {
+      display: flex; align-items: center; gap: 2px;
+      list-style: none; margin-left: 16px;
+    }
+    .nav__links a {
+      display: flex; align-items: center;
+      height: 34px; padding: 0 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      transition: all var(--fast) var(--ease);
+    }
+    .nav__links a:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+    }
+    .nav__spacer { flex: 1; }
+    .nav__cta { display: flex; align-items: center; gap: 10px; }
+    .nav__cta .btn { height: 38px; padding: 0 18px; font-size: 13px; }
+    .nav__cta .signin {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.55);
+      padding: 0 12px;
+      transition: color var(--fast) var(--ease);
+    }
+    .nav__cta .signin:hover { color: var(--white); }
+    .nav__hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      color: var(--white); padding: 4px;
+    }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* HERO — dark, bold                                            */
+    /* ════════════════════════════════════════════════════════════ */
+    .hero {
+      background: var(--dark);
+      padding: 96px 0 100px;
+      position: relative; overflow: hidden;
+    }
+    /* Gradient mesh background */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 800px 600px at 65% -10%, rgba(91,79,255,0.45) 0%, transparent 65%),
+        radial-gradient(ellipse 500px 400px at 15% 80%, rgba(91,79,255,0.18) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    /* Subtle grid lines */
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+    .hero__inner {
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 72px; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .hero__badge { margin-bottom: 28px; }
+    .hero__title {
+      font-size: 60px; line-height: 66px;
+      font-weight: 800; letter-spacing: -0.03em;
+      color: var(--white); margin-bottom: 22px;
+    }
+    .hero__title em {
+      font-style: normal;
+      background: linear-gradient(135deg, #A89BFF 0%, #7B6FFF 40%, #5B4FFF 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero__sub {
+      font-size: 18px; line-height: 30px;
+      color: rgba(255,255,255,0.58);
+      margin-bottom: 40px; max-width: 500px;
+    }
+    .hero__actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero__trust {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 28px; flex-wrap: wrap;
+    }
+    .hero__trust-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: rgba(255,255,255,0.38);
+      font-weight: 500;
+    }
+    .hero__trust-item svg { width: 13px; height: 13px; color: var(--success); }
+
+    /* ── Mockup ─────────────────────────────────────────────────── */
+    .hero__mockup { position: relative; }
+    .mockup {
+      background: var(--dark-2);
+      border: 1px solid var(--dark-border-2);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-dark), inset 0 1px 0 rgba(255,255,255,0.06);
+      padding: 20px;
+      position: relative; z-index: 1;
+    }
+    .mockup__bar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
+    }
+    .mockup__dots { display: flex; gap: 7px; }
+    .mockup__dot { width: 11px; height: 11px; border-radius: 50%; }
+    .mockup__dot:nth-child(1) { background: #FF6058; }
+    .mockup__dot:nth-child(2) { background: #FFBD2E; }
+    .mockup__dot:nth-child(3) { background: #28CA41; }
+    .mockup__addr {
+      flex: 1; height: 26px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-pill);
+      display: flex; align-items: center; padding: 0 12px; gap: 6px;
+    }
+    .mockup__addr span { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .mockup__addr-lock { color: var(--success); }
+
+    .mockup__stats {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+      margin-bottom: 14px;
+    }
+    .mockup__stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-md); padding: 14px 16px;
+    }
+    .mockup__stat-val {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--white);
+    }
+    .mockup__stat-tag {
+      display: inline-flex; align-items: center;
+      font-size: 10px; font-weight: 700;
+      background: rgba(22,194,106,0.18);
+      color: var(--success);
+      padding: 1px 6px; border-radius: 99px;
+      margin-left: 6px; vertical-align: middle;
+    }
+    .mockup__stat-label { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 3px; }
+
+    .mockup__table {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-lg); overflow: hidden;
+    }
+    .mockup__thead {
+      display: grid;
+      grid-template-columns: 26px 1fr 88px 72px 52px 68px;
+      column-gap: 8px;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mockup__thead span {
+      font-size: 10px; font-weight: 600;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .mockup__row {
+      display: grid;
+      grid-template-columns: 26px 1fr 88px 72px 52px 68px;
+      column-gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      align-items: center;
+      transition: background var(--fast) var(--ease);
+    }
+    .mockup__row:last-child { border-bottom: none; }
+    .mockup__row:hover { background: rgba(255,255,255,0.04); }
+
+    .mockup__check {
+      width: 16px; height: 16px; border-radius: 5px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+    }
+    .mockup__check--on {
+      background: var(--accent); border-color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mockup__check--on::after {
+      content: '';
+      width: 8px; height: 5px;
+      border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff;
+      transform: rotate(-45deg) translate(1px,-1px);
+    }
+    .mockup__vendor { font-size: 12px; font-weight: 600; color: var(--white); }
+    .mockup__date   { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 1px; }
+
+    .mockup__cat {
+      display: inline-flex; align-items: center;
+      font-size: 10px; font-weight: 700;
+      padding: 3px 9px; border-radius: 99px;
+    }
+    .cat-software { background: rgba(91,79,255,0.22); color: #A89BFF; }
+    .cat-office   { background: rgba(59,130,246,0.22); color: #93C5FD; }
+    .cat-util     { background: rgba(22,194,106,0.20); color: #6EE7A8; }
+    .cat-travel   { background: rgba(249,115,22,0.20); color: #FDBA74; }
+
+    .mockup__amount { font-size: 12px; font-weight: 700; color: var(--white); text-align: right; }
+    .mockup__gl     { font-size: 11px; color: rgba(255,255,255,0.3); text-align: left; }
+
+    .mockup__status {
+      font-size: 10px; font-weight: 700;
+      padding: 3px 9px; border-radius: 99px; text-align: center;
+    }
+    .status-ready  { background: rgba(22,194,106,0.18); color: #6EE7A8; }
+    .status-review { background: rgba(245,158,11,0.18); color: #FCD34D; }
+
+    .mockup__footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 0;
+      margin-top: 14px;
+    }
+    .mockup__export-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--accent);
+      color: #fff; border: none; cursor: pointer;
+      border-radius: var(--r-pill);
+      padding: 0 16px; height: 34px;
+      font-size: 12px; font-weight: 700;
+      box-shadow: var(--shadow-accent);
+    }
+    .mockup__export-btn svg { width: 14px; height: 14px; }
+    .mockup__count { font-size: 11px; color: rgba(255,255,255,0.3); }
+
+    /* Floating badge */
+    .mockup__badge {
+      position: absolute; bottom: -18px; left: -24px;
+      background: var(--white);
+      border-radius: var(--r-lg);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-float);
+      display: flex; align-items: center; gap: 12px;
+      z-index: 2;
+    }
+    .mockup__badge-icon {
+      width: 38px; height: 38px;
+      background: var(--success-bg);
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .mockup__badge-icon svg { width: 18px; height: 18px; color: var(--success); }
+    .mockup__badge-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .mockup__badge-sub   { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* STRIP — vivid accent bg                                      */
+    /* ════════════════════════════════════════════════════════════ */
+    .strip {
+      background: var(--accent);
+      padding: 32px 0;
+    }
+    .strip__inner {
+      display: flex; align-items: center;
+      justify-content: center;
+      gap: 56px; flex-wrap: wrap;
+    }
+    .strip__stat { text-align: center; }
+    .strip__val {
+      font-size: 32px; font-weight: 800; letter-spacing: -0.03em;
+      color: var(--white);
+    }
+    .strip__desc { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 3px; }
+    .strip__divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* HOW IT WORKS — dark bg with flow diagram                    */
+    /* ════════════════════════════════════════════════════════════ */
+    .hiw {
+      background: var(--dark);
+      position: relative;
+    }
+    .hiw::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 800px 500px at 100% -10%, rgba(91,79,255,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 400px at 0% 100%, rgba(22,194,106,0.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Flow container */
+    .hiw .flow {
+      display: flex; align-items: flex-start;
+      gap: 0; position: relative;
+    }
+    .hiw .flow::before {
+      content: '';
+      position: absolute; top: 60px;
+      left: calc(10% + 4px); width: calc(80% - 8px); height: 2px;
+      background: linear-gradient(90deg,
+        rgba(91,79,255,0.15) 0%, rgba(91,79,255,0.5) 20%,
+        rgba(91,79,255,0.5) 80%, rgba(22,194,106,0.5) 100%);
+      z-index: 0;
+    }
+
+    /* Step */
+    .hiw .step {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; position: relative; z-index: 1;
+    }
+    .hiw .step__icon-wrap {
+      width: 72px; height: 72px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; margin-bottom: 20px; flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .hiw .step__icon-wrap:hover { transform: translateY(-3px); }
+    .hiw .step__icon-wrap--violet { background: linear-gradient(135deg,#5B4FFF,#7B6FFF); box-shadow: 0 8px 28px rgba(91,79,255,0.45); }
+    .hiw .step__icon-wrap--indigo { background: linear-gradient(135deg,#4338CA,#6366F1); box-shadow: 0 8px 28px rgba(99,102,241,0.45); }
+    .hiw .step__icon-wrap--blue   { background: linear-gradient(135deg,#1D4ED8,#3B82F6); box-shadow: 0 8px 28px rgba(59,130,246,0.45); }
+    .hiw .step__icon-wrap--teal   { background: linear-gradient(135deg,#0D9488,#14B8A6); box-shadow: 0 8px 28px rgba(20,184,166,0.45); }
+    .hiw .step__icon-wrap--green  { background: linear-gradient(135deg,#059669,#16C26A); box-shadow: 0 8px 28px rgba(22,194,106,0.45); }
+    .hiw .step__icon-wrap svg { width: 32px; height: 32px; color: #fff; }
+
+    /* Number badge */
+    .hiw .step__num {
+      position: absolute; top: -10px; right: -10px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #0B0D18; border: 2px solid rgba(255,255,255,0.15);
+      font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Arrow connector */
+    .hiw .arrow {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      width: 40px; margin-top: 24px; color: rgba(91,79,255,0.5);
+    }
+    .hiw .arrow svg { width: 20px; height: 20px; }
+
+    /* Step card */
+    .hiw .step__card {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 20px 18px;
+      width: 100%; max-width: 190px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .hiw .step__card:hover { background: rgba(255,255,255,0.07); border-color: rgba(91,79,255,0.3); }
+    .hiw .step__title {
+      font-size: 13px; font-weight: 800; color: #fff;
+      letter-spacing: -0.2px; margin-bottom: 8px; text-align: center;
+    }
+    .hiw .step__desc {
+      font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.45); text-align: center;
+    }
+
+    /* Mini email widget */
+    .hiw .mini-email { margin: 0 auto 14px; width: 100%; max-width: 160px; }
+    .hiw .mini-email__row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; }
+    .hiw .mini-email__row--unread { background: rgba(91,79,255,0.12); }
+    .hiw .mini-email__dot { width: 6px; height: 6px; border-radius: 50%; background: #5B4FFF; flex-shrink: 0; }
+    .hiw .mini-email__dot--new { background: #16C26A; }
+    .hiw .mini-email__line { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.15); flex: 1; }
+    .hiw .mini-email__line--short { max-width: 40px; }
+    .hiw .mini-email__tag { font-size: 8px; font-weight: 700; color: #A89BFF; background: rgba(91,79,255,0.2); padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+
+    /* Mini rows widget */
+    .hiw .mini-rows { margin: 0 auto 14px; width: 100%; max-width: 160px; }
+    .hiw .mini-row { display: flex; align-items: center; gap: 4px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .hiw .mini-row__check { width: 10px; height: 10px; border-radius: 3px; background: #5B4FFF; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .hiw .mini-row__check svg { width: 7px; height: 7px; color: white; }
+    .hiw .mini-row__vendor { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.7); flex: 1; }
+    .hiw .mini-row__amount { font-size: 9px; font-weight: 700; color: #A89BFF; }
+    .hiw .mini-row__gl { font-size: 8px; color: rgba(255,255,255,0.25); margin-left: 2px; }
+
+    /* Mini split widget */
+    .hiw .mini-split { display: flex; gap: 6px; margin: 0 auto 14px; max-width: 160px; }
+    .hiw .mini-split__doc { flex: 1; background: rgba(255,255,255,0.07); border-radius: 6px; padding: 6px; display: flex; flex-direction: column; gap: 3px; }
+    .hiw .mini-split__line { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.15); }
+    .hiw .mini-split__line--violet { background: rgba(91,79,255,0.5); }
+    .hiw .mini-split__line--short { width: 60%; }
+
+    /* Mini recon widget */
+    .hiw .mini-recon { margin: 0 auto 14px; max-width: 160px; }
+    .hiw .mini-recon__row { display: flex; align-items: center; gap: 5px; padding: 4px 6px; border-radius: 5px; margin-bottom: 3px; font-size: 9px; }
+    .hiw .mini-recon__row--match { background: rgba(22,194,106,0.1); }
+    .hiw .mini-recon__row--miss  { background: rgba(245,158,11,0.1); }
+    .hiw .mini-recon__icon { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .hiw .mini-recon__icon--match { background: #16C26A; }
+    .hiw .mini-recon__icon--miss  { background: #F59E0B; }
+    .hiw .mini-recon__icon svg { width: 8px; height: 8px; color: white; }
+    .hiw .mini-recon__label { color: rgba(255,255,255,0.5); flex: 1; }
+    .hiw .mini-recon__val { color: rgba(255,255,255,0.7); font-weight: 600; }
+
+    /* Mini bundle widget */
+    .hiw .mini-bundle { margin: 0 auto 14px; max-width: 120px; position: relative; }
+    .hiw .mini-bundle__zip { width: 72px; height: 84px; margin: 0 auto; background: linear-gradient(135deg,#059669,#16C26A); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 8px 24px rgba(22,194,106,0.35); position: relative; }
+    .hiw .mini-bundle__zip::before { content: ''; position: absolute; inset: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%); }
+    .hiw .mini-bundle__zip svg { width: 28px; height: 28px; color: white; position: relative; z-index: 1; }
+    .hiw .mini-bundle__label { font-size: 9px; font-weight: 800; color: rgba(255,255,255,0.9); letter-spacing: 0.05em; position: relative; z-index: 1; }
+    .hiw .mini-bundle__badge { position: absolute; top: -6px; right: -6px; background: #5B4FFF; border-radius: 6px; padding: 2px 6px; font-size: 8px; font-weight: 700; color: white; box-shadow: 0 2px 8px rgba(91,79,255,0.5); }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* FEATURES — alternating full-width feature rows              */
+    /* ════════════════════════════════════════════════════════════ */
+    .features-list { display: flex; flex-direction: column; }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border-gray);
+    }
+    .feature-row:first-child { padding-top: 0; }
+    .feature-row:last-of-type { border-bottom: none; }
+
+    /* Flip: screenshot moves to left column */
+    .feature-row--flip .feature-row__visual { order: -1; }
+    .feature-row--flip .feature-row__copy   { margin-left: auto; }
+
+    .feature-row__copy { max-width: 460px; }
+
+    /* Screenshot panel */
+    .feature-row__visual {
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-gray);
+      box-shadow: var(--shadow-float);
+      background: var(--surface-muted);
+      line-height: 0;
+      cursor: zoom-in;
+      position: relative;
+      transition: box-shadow var(--base) var(--ease), transform var(--base) var(--ease);
+    }
+    .feature-row__visual:hover {
+      box-shadow: 0 20px 60px rgba(11,13,24,0.18);
+      transform: translateY(-2px);
+    }
+    .feature-row__visual img {
+      width: 100%; display: block;
+      object-fit: cover; object-position: top center;
+    }
+    /* Zoom hint badge */
+    .feature-row__visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 60%, rgba(91,79,255,0.06) 100%);
+      pointer-events: none;
+      transition: opacity var(--base) var(--ease);
+      opacity: 0;
+    }
+    .feature-row__visual:hover::after { opacity: 1; }
+    .feature-row__visual .zoom-hint {
+      position: absolute;
+      bottom: 14px; right: 14px;
+      background: rgba(11,13,24,0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--r-pill);
+      padding: 5px 12px 5px 8px;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.75);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity var(--base) var(--ease), transform var(--base) var(--ease);
+      pointer-events: none;
+    }
+    .feature-row__visual .zoom-hint svg { width: 13px; height: 13px; color: rgba(255,255,255,0.6); }
+    .feature-row__visual:hover .zoom-hint { opacity: 1; transform: translateY(0); }
+
+    /* ── Lightbox ────────────────────────────────────────────── */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      background: rgba(7,8,16,0.88);
+      backdrop-filter: blur(18px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s var(--ease);
+    }
+    .lightbox.open {
+      opacity: 1; pointer-events: auto;
+    }
+    .lightbox__inner {
+      position: relative;
+      max-width: min(1200px, 94vw);
+      max-height: 90vh;
+      display: flex; align-items: center; justify-content: center;
+      transform: scale(0.94);
+      transition: transform 0.25s var(--ease);
+    }
+    .lightbox.open .lightbox__inner { transform: scale(1); }
+    .lightbox__img {
+      display: block;
+      max-width: 100%; max-height: 90vh;
+      border-radius: var(--r-xl);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+    .lightbox__close {
+      position: absolute; top: -14px; right: -14px;
+      width: 36px; height: 36px;
+      background: var(--white);
+      border: none; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform var(--fast) var(--ease), background var(--fast) var(--ease);
+    }
+    .lightbox__close:hover { transform: scale(1.1); background: #f0eeff; }
+    .lightbox__close svg { width: 16px; height: 16px; color: var(--text-primary); }
+    .lightbox__caption {
+      position: absolute;
+      bottom: -38px; left: 0; right: 0;
+      text-align: center;
+      font-size: 12px; color: rgba(255,255,255,0.4);
+      font-weight: 500;
+    }
+
+    /* Copy side typography */
+    .feature-row .feature__icon {
+      width: 52px; height: 52px;
+      border-radius: var(--r-md);
+      background: var(--accent-surface);
+      border: 1px solid var(--border-soft);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+    }
+    .feature-row .feature__icon svg { width: 26px; height: 26px; color: var(--accent); }
+    .feature-row .feature__title {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.025em;
+      line-height: 1.2; margin-bottom: 14px; color: var(--text-primary);
+    }
+    .feature-row .feature__body {
+      font-size: 16px; line-height: 28px; color: var(--text-secondary);
+    }
+
+    /* Bottom 2-up compact cards (for features without screenshots) */
+    .features-cards {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 18px; padding-top: 48px;
+    }
+    .feature-card {
+      background: var(--surface-muted);
+      border: 1px solid var(--border-gray);
+      border-radius: var(--r-lg);
+      padding: 36px;
+      transition: box-shadow var(--base) var(--ease), transform var(--base) var(--ease), border-color var(--base) var(--ease);
+    }
+    .feature-card:hover {
+      box-shadow: var(--shadow-float); transform: translateY(-3px); border-color: var(--border-soft);
+    }
+    .feature-card--accent {
+      background: var(--accent); border-color: var(--accent);
+    }
+    .feature-card--accent:hover { box-shadow: var(--shadow-accent); border-color: var(--accent-deep); }
+    .feature-card .feature__icon {
+      width: 48px; height: 48px; border-radius: var(--r-md);
+      background: var(--accent-surface); border: 1px solid var(--border-soft);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    }
+    .feature-card .feature__icon svg { width: 24px; height: 24px; color: var(--accent); }
+    .feature-card--accent .feature__icon { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
+    .feature-card--accent .feature__icon svg { color: var(--white); }
+    .feature-card .feature__title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
+    .feature-card--accent .feature__title { color: var(--white); }
+    .feature-card .feature__body { font-size: 14px; line-height: 24px; color: var(--text-secondary); }
+    .feature-card--accent .feature__body { color: rgba(255,255,255,0.70); }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* PRICING — dark background                                    */
+    /* ════════════════════════════════════════════════════════════ */
+    .pricing-section { background: var(--dark); }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 18px; align-items: start;
+    }
+    .pricing-card {
+      border-radius: var(--r-lg);
+      padding: 36px 28px 30px;
+      position: relative;
+    }
+    .pricing-card--free {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border-2);
+    }
+    .pricing-card--featured {
+      background: var(--accent);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: var(--shadow-accent);
+    }
+    .pricing-card--bookkeeper {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border-2);
+    }
+    .pricing__badge {
+      display: inline-flex;
+      font-size: 11px; font-weight: 700;
+      padding: 4px 11px; border-radius: 99px;
+      margin-bottom: 22px; letter-spacing: 0.02em;
+    }
+    .pricing-card--free .pricing__badge      { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+    .pricing-card--featured .pricing__badge  { background: rgba(255,255,255,0.22); color: var(--white); }
+    .pricing-card--bookkeeper .pricing__badge { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+
+    .pricing__name {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+      color: var(--white); margin-bottom: 8px;
+    }
+    .pricing__tagline {
+      font-size: 13px; line-height: 21px;
+      color: rgba(255,255,255,0.5); margin-bottom: 28px;
+    }
+    .pricing-card--featured .pricing__tagline { color: rgba(255,255,255,0.75); }
+    .pricing__price {
+      font-size: 46px; font-weight: 800; letter-spacing: -0.04em;
+      color: var(--white); margin-bottom: 4px;
+    }
+    .pricing__price sup { font-size: 22px; vertical-align: top; margin-top: 10px; }
+    .pricing__period { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
+    .pricing-card--featured .pricing__period { color: rgba(255,255,255,0.65); }
+
+    .pricing__divider { height: 1px; background: rgba(255,255,255,0.1); margin-bottom: 24px; }
+    .pricing-card--featured .pricing__divider { background: rgba(255,255,255,0.2); }
+
+    .pricing__items { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+    .pricing__item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; line-height: 20px; color: rgba(255,255,255,0.65);
+    }
+    .pricing-card--featured .pricing__item { color: rgba(255,255,255,0.9); }
+    .pricing__item-check {
+      width: 18px; height: 18px; flex-shrink: 0;
+      border-radius: 50%; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pricing-card--free .pricing__item-check,
+    .pricing-card--bookkeeper .pricing__item-check {
+      background: rgba(22,194,106,0.2);
+    }
+    .pricing-card--featured .pricing__item-check { background: rgba(255,255,255,0.25); }
+    .pricing__item-check svg { width: 10px; height: 10px; color: var(--success); }
+    .pricing-card--featured .pricing__item-check svg { color: var(--white); }
+
+    .pricing__cta { display: block; width: 100%; text-align: center; }
+    .pricing-card--free .pricing__cta,
+    .pricing-card--bookkeeper .pricing__cta {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.14);
+      height: 46px; border-radius: var(--r-pill);
+      font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--fast) var(--ease);
+    }
+    .pricing-card--free .pricing__cta:hover,
+    .pricing-card--bookkeeper .pricing__cta:hover {
+      background: rgba(255,255,255,0.14);
+    }
+    .pricing-card--featured .pricing__cta {
+      background: var(--white);
+      color: var(--accent);
+      height: 46px; border-radius: var(--r-pill);
+      font-size: 14px; font-weight: 700;
+      box-shadow: var(--shadow-float);
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--fast) var(--ease);
+    }
+    .pricing-card--featured .pricing__cta:hover { background: #f5f4ff; }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* CTA BANNER                                                   */
+    /* ════════════════════════════════════════════════════════════ */
+    .cta-banner {
+      background: linear-gradient(135deg, #3D30E8 0%, #5B4FFF 50%, #7B6FFF 100%);
+      padding: 88px 64px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 700px 500px at 50% -30%, rgba(255,255,255,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 300px at 10% 110%, rgba(255,255,255,0.07) 0%, transparent 60%);
+    }
+    .cta-banner__title {
+      font-size: 48px; line-height: 56px;
+      font-weight: 800; letter-spacing: -0.03em;
+      color: var(--white); margin-bottom: 18px;
+      position: relative;
+    }
+    .cta-banner__sub {
+      font-size: 18px; line-height: 30px;
+      color: rgba(255,255,255,0.72);
+      margin-bottom: 40px; max-width: 520px;
+      margin-left: auto; margin-right: auto;
+      position: relative;
+    }
+    .cta-banner__actions {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; flex-wrap: wrap; position: relative;
+    }
+    .cta-banner__note {
+      font-size: 12px; color: rgba(255,255,255,0.45);
+      margin-top: 22px; position: relative;
+    }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* FOOTER                                                       */
+    /* ════════════════════════════════════════════════════════════ */
+    .footer {
+      background: var(--dark);
+      border-top: 1px solid var(--dark-border);
+      padding: 56px 0 36px;
+    }
+    .footer__inner {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px; margin-bottom: 52px;
+    }
+    .footer__brand p {
+      font-size: 13px; line-height: 22px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 16px; max-width: 260px;
+    }
+    .footer__col-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      margin-bottom: 18px;
+    }
+    .footer__links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer__links a {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      transition: color var(--fast) var(--ease);
+    }
+    .footer__links a:hover { color: var(--white); }
+    .footer__bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 24px; border-top: 1px solid var(--dark-border);
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer__copy { font-size: 12px; color: rgba(255,255,255,0.25); }
+    .footer__legal { display: flex; gap: 22px; }
+    .footer__legal a { font-size: 12px; color: rgba(255,255,255,0.3); transition: color var(--fast) var(--ease); }
+    .footer__legal a:hover { color: rgba(255,255,255,0.6); }
+
+    /* ════════════════════════════════════════════════════════════ */
+    /* RESPONSIVE                                                   */
+    /* ════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .hero__inner { grid-template-columns: 1fr; gap: 56px; }
+      .hero__title { font-size: 48px; line-height: 56px; }
+      .hero__mockup { display: none; }
+      .hiw .flow { flex-wrap: wrap; gap: 16px; }
+      .hiw .flow::before { display: none; }
+      .hiw .step { flex: 0 0 calc(50% - 8px); }
+      .hiw .arrow { display: none; }
+      .feature-row { grid-template-columns: 1fr; gap: 40px; padding: 56px 0; }
+      .feature-row--flip .feature-row__visual { order: 0; }
+      .feature-row--flip .feature-row__copy { margin-left: 0; }
+      .feature-row__copy { max-width: 100%; }
+      .features-cards { grid-template-columns: 1fr 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+      .footer__inner { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .section { padding: 72px 0; }
+      .section-title { font-size: 32px; line-height: 40px; }
+      .hero { padding: 64px 0 72px; }
+      .hero__title { font-size: 38px; line-height: 46px; }
+      .nav__links { display: none; }
+      .nav__hamburger { display: block; }
+      .strip__inner { gap: 32px; }
+      .strip__divider { display: none; }
+      .hiw .step { flex: 0 0 100%; }
+      .features-cards { grid-template-columns: 1fr; }
+      .cta-banner { padding: 56px 28px; }
+      .cta-banner__title { font-size: 34px; line-height: 42px; }
+      .footer__inner { grid-template-columns: 1fr; }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo">
+        <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" rx="14" fill="#5B4FFF"/>
+          <rect width="64" height="64" rx="14" fill="url(#nav-glow)" opacity="0.4"/>
+          <path d="M13 13a3 3 0 0 1 3-3h16l9 9v24a3 3 0 0 1-3 3H16a3 3 0 0 1-3-3V13z" fill="white"/>
+          <path d="M32 10 L41 19 H32 V10z" fill="#5B4FFF" opacity="0.22"/>
+          <rect x="18" y="24" width="14" height="2" rx="1" fill="#5B4FFF" opacity="0.35"/>
+          <rect x="18" y="29" width="18" height="2" rx="1" fill="#5B4FFF" opacity="0.25"/>
+          <rect x="18" y="34" width="11" height="2" rx="1" fill="#5B4FFF" opacity="0.20"/>
+          <circle cx="43" cy="43" r="10" fill="#16C26A"/>
+          <path d="M38.5 43 L41.5 46 L47.5 40" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <radialGradient id="nav-glow" cx="30%" cy="20%" r="70%">
+              <stop offset="0%" stop-color="white" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="white" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+        </svg>
+        <div class="nav__wordmark">
+          <span class="nav__wordmark-bills">Bills</span><span class="nav__wordmark-clerk">Clerk</span>
+        </div>
+      </a>
+      <ul class="nav__links">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+      <div class="nav__spacer"></div>
+      <div class="nav__cta">
+        <a href="#" class="signin">Sign in</a>
+        <a href="#" class="btn btn--accent btn--sm">Start free</a>
+      </div>
+      <button class="nav__hamburger" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__inner">
+
+      <div class="hero__copy">
+        <div class="hero__badge">
+          <span class="pill-label pill-label--dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            AI bookkeeping prep — your extra employee
+          </span>
+        </div>
+        <h1 class="hero__title">Your invoices,<br/><em>handled.</em></h1>
+        <p class="hero__sub">Forward your invoices by email or upload PDFs. BillsClerk extracts, categorizes, and reconciles everything into spreadsheet-ready bookkeeping entries — so you stop entering data and start running your business.</p>
+        <div class="hero__actions">
+          <a href="#" class="btn btn--accent">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+            Start free — no card needed
+          </a>
+          <a href="#how-it-works" class="btn btn--ghost-light">See how it works</a>
+        </div>
+        <div class="hero__trust">
+          <div class="hero__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Free up to 10 invoices/month
+          </div>
+          <div class="hero__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            No other accounting software needed
+          </div>
+          <div class="hero__trust-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Export to Excel in one click
+          </div>
+        </div>
+      </div>
+
+      <!-- Mockup -->
+      <div class="hero__mockup">
+        <div class="mockup">
+          <div class="mockup__bar">
+            <div class="mockup__dots">
+              <div class="mockup__dot"></div>
+              <div class="mockup__dot"></div>
+              <div class="mockup__dot"></div>
+            </div>
+            <div class="mockup__addr">
+              <svg style="width:11px;height:11px;color:#16C26A;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <span>app.billsclerk.com / dashboard</span>
+            </div>
+          </div>
+
+          <div class="mockup__stats">
+            <div class="mockup__stat">
+              <div class="mockup__stat-val">24 <span class="mockup__stat-tag">↑12%</span></div>
+              <div class="mockup__stat-label">Invoices this month</div>
+            </div>
+            <div class="mockup__stat">
+              <div class="mockup__stat-val">$8,340</div>
+              <div class="mockup__stat-label">Total expenses</div>
+            </div>
+            <div class="mockup__stat">
+              <div class="mockup__stat-val">18 min</div>
+              <div class="mockup__stat-label">To review &amp; export</div>
+            </div>
+          </div>
+
+          <div class="mockup__table">
+            <div class="mockup__thead">
+              <span></span>
+              <span>VENDOR</span>
+              <span>CATEGORY</span>
+              <span>AMOUNT</span>
+              <span>GL</span>
+              <span>STATUS</span>
+            </div>
+            <div class="mockup__row">
+              <div class="mockup__check mockup__check--on"></div>
+              <div><div class="mockup__vendor">Adobe Inc.</div><div class="mockup__date">Mar 01, 2026</div></div>
+              <span class="mockup__cat cat-software">Software</span>
+              <div class="mockup__amount">$59.99</div>
+              <div class="mockup__gl">6100</div>
+              <span class="mockup__status status-ready">Ready</span>
+            </div>
+            <div class="mockup__row">
+              <div class="mockup__check mockup__check--on"></div>
+              <div><div class="mockup__vendor">WeWork</div><div class="mockup__date">Mar 01, 2026</div></div>
+              <span class="mockup__cat cat-office">Office</span>
+              <div class="mockup__amount">$850.00</div>
+              <div class="mockup__gl">6200</div>
+              <span class="mockup__status status-ready">Ready</span>
+            </div>
+            <div class="mockup__row">
+              <div class="mockup__check"></div>
+              <div><div class="mockup__vendor">Hydro Quebec</div><div class="mockup__date">Mar 03, 2026</div></div>
+              <span class="mockup__cat cat-util">Utilities</span>
+              <div class="mockup__amount">$142.88</div>
+              <div class="mockup__gl">6300</div>
+              <span class="mockup__status status-review">Review</span>
+            </div>
+            <div class="mockup__row">
+              <div class="mockup__check mockup__check--on"></div>
+              <div><div class="mockup__vendor">Air Canada</div><div class="mockup__date">Mar 05, 2026</div></div>
+              <span class="mockup__cat cat-travel">Travel</span>
+              <div class="mockup__amount">$412.00</div>
+              <div class="mockup__gl">6500</div>
+              <span class="mockup__status status-ready">Ready</span>
+            </div>
+          </div>
+
+          <div class="mockup__footer">
+            <div class="mockup__count" style="color:rgba(255,255,255,0.3);font-size:11px;">22 of 24 reviewed</div>
+            <button class="mockup__export-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export to Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="mockup__badge">
+          <div class="mockup__badge-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="mockup__badge-title">Reconciliation complete</div>
+            <div class="mockup__badge-sub">2 gaps found · $142.88 unmatched</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ STRIP ════════════════════════════════════════════════════ -->
+<div class="strip">
+  <div class="container">
+    <div class="strip__inner">
+      <div class="strip__stat">
+        <div class="strip__val">90%+</div>
+        <div class="strip__desc">of invoices processed without manual entry</div>
+      </div>
+      <div class="strip__divider"></div>
+      <div class="strip__stat">
+        <div class="strip__val">~18 min</div>
+        <div class="strip__desc">average monthly review time</div>
+      </div>
+      <div class="strip__divider"></div>
+      <div class="strip__stat">
+        <div class="strip__val">Any format</div>
+        <div class="strip__desc">PDFs, photos, receipts, email forwards</div>
+      </div>
+      <div class="strip__divider"></div>
+      <div class="strip__stat">
+        <div class="strip__val">1 bundle</div>
+        <div class="strip__desc">entries + source docs, ready for your accountant</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════════ -->
+<section class="section hiw" id="how-it-works">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <div class="section-label section-label--dark">How it works</div>
+      <h2 class="section-title section-title--center section-title--dark">Five steps. No data entry.</h2>
+      <p class="section-sub section-sub--center section-sub--dark">From a pile of invoices to an accountant-ready bundle — without touching a spreadsheet.</p>
+    </div>
+    <div class="flow">
+
+
+      <!-- Step 1: Email inbox -->
+      <div class="step reveal">
+        <div class="step__icon-wrap step__icon-wrap--violet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div class="step__num">1</div>
+        </div>
+        <div class="mini-email">
+          <div class="mini-email__row mini-email__row--unread">
+            <div class="mini-email__dot mini-email__dot--new"></div>
+            <div class="mini-email__line"></div>
+            <div class="mini-email__tag">INV</div>
+          </div>
+          <div class="mini-email__row mini-email__row--unread">
+            <div class="mini-email__dot"></div>
+            <div class="mini-email__line"></div>
+            <div class="mini-email__tag">INV</div>
+          </div>
+          <div class="mini-email__row">
+            <div class="mini-email__dot" style="background:rgba(255,255,255,0.15)"></div>
+            <div class="mini-email__line" style="background:rgba(255,255,255,0.08)"></div>
+          </div>
+          <div class="mini-email__row">
+            <div class="mini-email__dot" style="background:rgba(255,255,255,0.15)"></div>
+            <div class="mini-email__line mini-email__line--short" style="background:rgba(255,255,255,0.08)"></div>
+          </div>
+        </div>
+        <div class="step__card">
+          <div class="step__title">Invoices arrive</div>
+          <div class="step__desc">Forward invoice emails or upload PDFs, photos, and receipts. Any format works.</div>
+        </div>
+      </div>
+
+      <!-- Arrow 1→2 -->
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Step 2: AI extraction -->
+      <div class="step reveal" style="transition-delay:.08s">
+        <div class="step__icon-wrap step__icon-wrap--indigo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="M18 2v4h4"/></svg>
+          <div class="step__num">2</div>
+        </div>
+        <div class="mini-rows">
+          <div class="mini-row">
+            <div class="mini-row__check"><svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg></div>
+            <div class="mini-row__vendor">Adobe Inc.</div>
+            <div class="mini-row__amount">$59.99</div>
+            <div class="mini-row__gl">6100</div>
+          </div>
+          <div class="mini-row">
+            <div class="mini-row__check"><svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg></div>
+            <div class="mini-row__vendor">WeWork</div>
+            <div class="mini-row__amount">$850</div>
+            <div class="mini-row__gl">6200</div>
+          </div>
+          <div class="mini-row">
+            <div class="mini-row__check"><svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg></div>
+            <div class="mini-row__vendor">AWS</div>
+            <div class="mini-row__amount">$2,340</div>
+            <div class="mini-row__gl">6100</div>
+          </div>
+          <div class="mini-row">
+            <div class="mini-row__check" style="background:rgba(255,255,255,0.1)"></div>
+            <div class="mini-row__vendor" style="color:rgba(255,255,255,0.3)">Air Canada</div>
+            <div class="mini-row__amount" style="color:rgba(255,255,255,0.2)">$412</div>
+          </div>
+        </div>
+        <div class="step__card">
+          <div class="step__title">AI extracts &amp; categorizes</div>
+          <div class="step__desc">Vendor, date, amount, and GL code — filled in automatically from your chart of accounts.</div>
+        </div>
+      </div>
+
+      <!-- Arrow 2→3 -->
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Step 3: Review side-by-side -->
+      <div class="step reveal" style="transition-delay:.16s">
+        <div class="step__icon-wrap step__icon-wrap--blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          <div class="step__num">3</div>
+        </div>
+        <div class="mini-split">
+          <div class="mini-split__doc">
+            <div class="mini-split__line mini-split__line--violet" style="width:80%"></div>
+            <div class="mini-split__line" style="width:100%"></div>
+            <div class="mini-split__line" style="width:70%"></div>
+            <div class="mini-split__line" style="width:90%"></div>
+            <div class="mini-split__line" style="width:55%"></div>
+            <div style="margin-top:4px; height:16px; background:rgba(91,79,255,0.25); border-radius:3px; display:flex; align-items:center; justify-content:center;">
+              <span style="font-size:8px; color:#A89BFF; font-weight:700;">$59.99</span>
+            </div>
+          </div>
+          <div class="mini-split__doc">
+            <div style="font-size:8px; color:rgba(255,255,255,0.35); margin-bottom:4px; font-weight:600;">ENTRIES</div>
+            <div class="mini-split__line mini-split__line--violet" style="width:90%"></div>
+            <div class="mini-split__line" style="width:100%"></div>
+            <div class="mini-split__line" style="width:60%"></div>
+            <div style="margin-top:4px; background:rgba(22,194,106,0.2); border-radius:3px; padding:2px 5px;">
+              <span style="font-size:8px; color:#6EE7A8; font-weight:700;">✓ Ready</span>
+            </div>
+          </div>
+        </div>
+        <div class="step__card">
+          <div class="step__title">Review side-by-side</div>
+          <div class="step__desc">Original invoice beside extracted entries. Edit any field. Accept with one click.</div>
+        </div>
+      </div>
+
+      <!-- Arrow 3→4 -->
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Step 4: Reconciliation -->
+      <div class="step reveal" style="transition-delay:.24s">
+        <div class="step__icon-wrap step__icon-wrap--teal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <div class="step__num">4</div>
+        </div>
+        <div class="mini-recon">
+          <div style="font-size:8px; font-weight:700; color:rgba(255,255,255,0.3); margin-bottom:5px; text-align:center; letter-spacing:0.05em;">BANK STATEMENT MATCH</div>
+          <div class="mini-recon__row mini-recon__row--match">
+            <div class="mini-recon__icon mini-recon__icon--match">
+              <svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>
+            </div>
+            <div class="mini-recon__label">Adobe · $59.99</div>
+            <div class="mini-recon__val" style="color:#6EE7A8">✓</div>
+          </div>
+          <div class="mini-recon__row mini-recon__row--match">
+            <div class="mini-recon__icon mini-recon__icon--match">
+              <svg viewBox="0 0 10 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 3.5 6.5 9 1"/></svg>
+            </div>
+            <div class="mini-recon__label">WeWork · $850</div>
+            <div class="mini-recon__val" style="color:#6EE7A8">✓</div>
+          </div>
+          <div class="mini-recon__row mini-recon__row--miss">
+            <div class="mini-recon__icon mini-recon__icon--miss">
+              <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg>
+            </div>
+            <div class="mini-recon__label">Rogers · $178</div>
+            <div class="mini-recon__val" style="color:#FCD34D">?</div>
+          </div>
+        </div>
+        <div class="step__card">
+          <div class="step__title">Reconcile with bank</div>
+          <div class="step__desc">Upload your bank or card statement. Matched entries confirmed. Gaps flagged instantly.</div>
+        </div>
+      </div>
+
+      <!-- Arrow 4→5 -->
+      <div class="arrow" style="color:rgba(22,194,106,0.5)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Step 5: Accountant's Bundle -->
+      <div class="step reveal" style="transition-delay:.32s">
+        <div class="step__icon-wrap step__icon-wrap--green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div class="step__num">5</div>
+        </div>
+        <div class="mini-bundle">
+          <div class="mini-bundle__zip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+            <div class="mini-bundle__label">.ZIP</div>
+          </div>
+          <div class="mini-bundle__badge">Bundle</div>
+          <div style="margin-top:8px; display:flex; flex-direction:column; gap:3px;">
+            <div style="display:flex; align-items:center; gap:5px; font-size:8px; color:rgba(255,255,255,0.4);">
+              <div style="width:8px;height:8px;background:rgba(22,194,106,0.4);border-radius:2px;flex-shrink:0;"></div>
+              bookkeeping.xlsx
+            </div>
+            <div style="display:flex; align-items:center; gap:5px; font-size:8px; color:rgba(255,255,255,0.4);">
+              <div style="width:8px;height:8px;background:rgba(91,79,255,0.4);border-radius:2px;flex-shrink:0;"></div>
+              invoices/ (8 files)
+            </div>
+            <div style="display:flex; align-items:center; gap:5px; font-size:8px; color:rgba(255,255,255,0.4);">
+              <div style="width:8px;height:8px;background:rgba(59,130,246,0.4);border-radius:2px;flex-shrink:0;"></div>
+              reconciliation.xlsx
+            </div>
+          </div>
+        </div>
+        <div class="step__card" style="border-color:rgba(22,194,106,0.25);">
+          <div class="step__title">Accountant's Bundle</div>
+          <div class="step__desc">One ZIP — entries, source invoices, reconciliation. Hand it to your accountant. Done.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════════ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
+      <p class="section-sub">From invoice to accountant-ready bundle — without manual entry, without new accounting software.</p>
+    </div>
+    <div class="features-list">
+
+      <!-- Row 1: Any invoice — copy left, screenshot right -->
+      <div class="feature-row reveal">
+        <div class="feature-row__copy">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="feature__title">Any invoice, any format</div>
+          <p class="feature__body">Upload PDFs, forward invoice emails to your dedicated address, or snap a photo of a paper receipt. BillsClerk handles vendor PDFs, scanned documents, and phone photos equally well — if it's an invoice, we'll read it.</p>
+        </div>
+        <div class="feature-row__visual" data-caption="Dashboard — upload &amp; pending review">
+          <img src="screenshots/dashboard.png" alt="BillsClerk dashboard showing invoice upload and pending review" />
+          <div class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Expand</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Side-by-side review — screenshot left, copy right -->
+      <div class="feature-row feature-row--flip reveal">
+        <div class="feature-row__copy">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="9" height="9" rx="1"/><rect x="12" y="3" width="9" height="9" rx="1"/><rect x="3" y="12" width="9" height="9" rx="1"/><rect x="12" y="12" width="9" height="9" rx="1"/></svg>
+          </div>
+          <div class="feature__title">Review side-by-side</div>
+          <p class="feature__body">View the original invoice document alongside its extracted entries at any time. Edit any field — vendor, category, GL code, amount — and confirm when you're happy. Nothing changes until you say so.</p>
+        </div>
+        <div class="feature-row__visual" data-caption="Side-by-side invoice &amp; entry review">
+          <img src="screenshots/data with invoice slideout.png" alt="Data page with invoice document shown side-by-side" />
+          <div class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Expand</div>
+        </div>
+      </div>
+
+      <!-- Row 3: Accountant's Bundle — copy left, screenshot right -->
+      <div class="feature-row reveal">
+        <div class="feature-row__copy">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/><polyline points="12 11 12 17"/><polyline points="9 14 12 17 15 14"/></svg>
+          </div>
+          <div class="feature__title">Accountant's Bundle export</div>
+          <p class="feature__body">Filter entries by month, quarter, or any date range and export a ZIP file containing your bookkeeping entries in Excel plus every underlying source invoice. One file. Hand it over. Done.</p>
+        </div>
+        <div class="feature-row__visual" data-caption="Data page — filter &amp; export your Accountant's Bundle">
+          <img src="screenshots/data.png" alt="Data page showing export options and accepted entries" />
+          <div class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Expand</div>
+        </div>
+      </div>
+
+      <!-- Row 4: Bank reconciliation — screenshot left, copy right -->
+      <div class="feature-row feature-row--flip reveal">
+        <div class="feature-row__copy">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="feature__title">Bank &amp; card reconciliation</div>
+          <p class="feature__body">Upload bank or credit card statements (CSV, Excel, or PDF) and BillsClerk matches them against your entries. Unmatched items are flagged clearly — so you arrive at your accountant meeting with gaps already identified.</p>
+        </div>
+        <div class="feature-row__visual" data-caption="Reconciliations — matched &amp; unmatched bank transactions">
+          <img src="screenshots/reconciliations.png" alt="Reconciliations page showing matched and unmatched bank transactions" />
+          <div class="zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>Expand</div>
+        </div>
+      </div>
+
+      <!-- Compact 2-up cards: Smart GL + Tags (no screenshots) -->
+      <div class="features-cards reveal">
+
+        <div class="feature-card feature-card--accent">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="feature__title">Smart GL &amp; heading suggestions</div>
+          <p class="feature__body">AI suggests accounting headings and GL codes drawn from your own chart of accounts — with sensible defaults if you haven't set one up yet. Gets smarter with every correction you make.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <div class="feature__title">Tags &amp; custom grouping</div>
+          <p class="feature__body">Create tags and apply them to any entry, then filter and export separately by tag. Perfect for property owners tracking costs per rental, or any business needing per-project or per-client breakdowns.</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ═══════════════════════════════════════════════════ -->
+<section class="section pricing-section" id="pricing">
+  <div class="container">
+    <div class="section-head section-head--center reveal">
+      <div class="section-label section-label--dark">Pricing</div>
+      <h2 class="section-title section-title--center section-title--dark">Simple, honest pricing.</h2>
+      <p class="section-sub section-sub--dark section-sub--center">Try everything free for a month — no credit card needed. Pick a plan when you're ready.</p>
+    </div>
+
+    <!-- Trial callout -->
+    <div class="reveal" style="text-align:center; margin-bottom: 44px;">
+      <div style="display:inline-flex; align-items:center; gap:10px; background:rgba(22,194,106,0.12); border:1px solid rgba(22,194,106,0.3); border-radius:999px; padding:10px 24px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16C26A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span style="color:#6EE7A8; font-size:14px; font-weight:600;">All plans include a full 1-month free trial — no credit card required</span>
+      </div>
+    </div>
+
+    <div class="pricing-grid">
+
+      <div class="pricing-card pricing-card--free reveal">
+        <div class="pricing__badge">Great for getting started</div>
+        <div class="pricing__name">Starter</div>
+        <div class="pricing__tagline">For freelancers and small businesses with a steady but manageable flow of invoices.</div>
+        <div class="pricing__price"><sup>$</sup>9<span style="font-size:28px;font-weight:600;">.99</span></div>
+        <div class="pricing__period">per month · 50 pages included</div>
+        <div class="pricing__divider"></div>
+        <ul class="pricing__items">
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            50 invoice pages per month
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            AI extraction &amp; GL code suggestions
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Email forwarding address
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Accountant's Bundle export
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Bank &amp; card reconciliation
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Custom chart of accounts
+          </li>
+        </ul>
+        <a href="#" class="pricing__cta">Start free trial</a>
+      </div>
+
+      <div class="pricing-card pricing-card--featured reveal" style="transition-delay:.1s">
+        <div class="pricing__badge">Most popular</div>
+        <div class="pricing__name">Pro</div>
+        <div class="pricing__tagline">For growing businesses with higher invoice volumes that need more room every month.</div>
+        <div class="pricing__price"><sup>$</sup>19<span style="font-size:28px;font-weight:600;">.99</span></div>
+        <div class="pricing__period">per month · 200 pages included</div>
+        <div class="pricing__divider"></div>
+        <ul class="pricing__items">
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            200 invoice pages per month
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Everything in Starter
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Tags &amp; custom grouping
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Per-tag bundle exports
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Priority support
+          </li>
+        </ul>
+        <a href="#" class="pricing__cta">Start free trial</a>
+      </div>
+
+      <div class="pricing-card pricing-card--bookkeeper reveal" style="transition-delay:.2s">
+        <div class="pricing__badge">High volume</div>
+        <div class="pricing__name">Custom</div>
+        <div class="pricing__tagline">For businesses processing large volumes or with specific workflow requirements. Let's talk.</div>
+        <div class="pricing__price" style="font-size:38px; margin-top:8px;">Custom</div>
+        <div class="pricing__period">tailored page limits &amp; pricing</div>
+        <div class="pricing__divider"></div>
+        <ul class="pricing__items">
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Custom page limits
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Everything in Pro
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Dedicated onboarding
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Dedicated account support
+          </li>
+          <li class="pricing__item">
+            <span class="pricing__item-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            Volume pricing
+          </li>
+        </ul>
+        <a href="#" class="pricing__cta">Contact sales</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA BANNER ════════════════════════════════════════════════ -->
+<div class="cta-banner reveal">
+  <h2 class="cta-banner__title">Stop entering invoices.<br/>Start using that time.</h2>
+  <p class="cta-banner__sub">Your AI bookkeeping assistant is ready. Forward your first invoice today and see your data extracted in seconds — no setup, no accounting software required.</p>
+  <div class="cta-banner__actions">
+    <a href="#" class="btn btn--white">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      Start free — no card needed
+    </a>
+    <a href="#how-it-works" class="btn btn--ghost-light">See how it works</a>
+  </div>
+  <p class="cta-banner__note">1-month free trial · No credit card required · Cancel any time</p>
+</div>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <a href="#" class="nav__logo">
+          <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="14" fill="#5B4FFF"/>
+            <rect width="64" height="64" rx="14" fill="url(#ft-glow)" opacity="0.4"/>
+            <path d="M13 13a3 3 0 0 1 3-3h16l9 9v24a3 3 0 0 1-3 3H16a3 3 0 0 1-3-3V13z" fill="white"/>
+            <path d="M32 10 L41 19 H32 V10z" fill="#5B4FFF" opacity="0.22"/>
+            <rect x="18" y="24" width="14" height="2" rx="1" fill="#5B4FFF" opacity="0.35"/>
+            <rect x="18" y="29" width="18" height="2" rx="1" fill="#5B4FFF" opacity="0.25"/>
+            <rect x="18" y="34" width="11" height="2" rx="1" fill="#5B4FFF" opacity="0.20"/>
+            <circle cx="43" cy="43" r="10" fill="#16C26A"/>
+            <path d="M38.5 43 L41.5 46 L47.5 40" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <radialGradient id="ft-glow" cx="30%" cy="20%" r="70%">
+                <stop offset="0%" stop-color="white" stop-opacity="0.2"/>
+                <stop offset="100%" stop-color="white" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+          </svg>
+          <div class="nav__wordmark">
+            <span class="nav__wordmark-bills">Bills</span><span class="nav__wordmark-clerk">Clerk</span>
+          </div>
+        </a>
+        <p>AI bookkeeping prep that turns your invoices into spreadsheet-ready accounting entries — automatically.</p>
+      </div>
+      <div>
+        <div class="footer__col-title">Product</div>
+        <ul class="footer__links">
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Use cases</div>
+        <ul class="footer__links">
+          <li><a href="#">Small business owners</a></li>
+          <li><a href="#">Freelancers &amp; consultants</a></li>
+          <li><a href="#">Bookkeepers</a></li>
+          <li><a href="#">Accountants</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer__col-title">Company</div>
+        <ul class="footer__links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__copy">© 2026 BillsClerk Inc. All rights reserved.</div>
+      <div class="footer__legal">
+        <a href="#">Privacy policy</a>
+        <a href="#">Terms of service</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ LIGHTBOX ═══════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot preview">
+  <div class="lightbox__inner">
+    <img class="lightbox__img" id="lightbox-img" src="" alt="" />
+    <button class="lightbox__close" id="lightbox-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="lightbox__caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<script>
+  /* ── Scroll reveal ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => io.observe(el));
+
+  /* ── Nav highlight ── */
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav__links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.getAttribute('id'); });
+    navLinks.forEach(a => {
+      const active = a.getAttribute('href') === '#' + current;
+      a.style.background = active ? 'rgba(255,255,255,0.1)' : '';
+      a.style.color = active ? '#fff' : '';
+    });
+  });
+
+  /* ── Lightbox ── */
+  const lightbox     = document.getElementById('lightbox');
+  const lbImg        = document.getElementById('lightbox-img');
+  const lbCaption    = document.getElementById('lightbox-caption');
+  const lbClose      = document.getElementById('lightbox-close');
+
+  function openLightbox(src, alt, caption) {
+    lbImg.src = src;
+    lbImg.alt = alt;
+    lbCaption.innerHTML = caption || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    /* Delay clearing src so close animation plays cleanly */
+    setTimeout(() => { lbImg.src = ''; }, 280);
+  }
+
+  /* Click on any feature-row__visual */
+  document.querySelectorAll('.feature-row__visual').forEach(panel => {
+    panel.addEventListener('click', () => {
+      const img     = panel.querySelector('img');
+      const caption = panel.dataset.caption || '';
+      openLightbox(img.src, img.alt, caption);
+    });
+  });
+
+  /* Close on button, backdrop click, or Escape */
+  lbClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
 </html>
